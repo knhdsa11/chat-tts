@@ -527,6 +527,3 @@ if __name__ == "__main__":
     app.log("[SYSTEM] พร้อมทำงาน ✅")
     root.protocol("WM_DELETE_WINDOW", lambda: (app.stop_system(), root.destroy()))
     root.mainloop()
-
-
-#
