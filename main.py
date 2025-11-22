@@ -58,7 +58,7 @@ class YouTubeTTS:
         # delay settings
         self.delay_per_char = tk.DoubleVar(value=1.0)  # seconds per char
         self.min_delay = tk.IntVar(value=1)
-        self.max_delay = tk.IntVar(value=30)
+        self.max_delay = tk.IntVar(value=15)
 
         # spam/filter settings
         self.spam_window = tk.IntVar(value=SPAM_WINDOW_SECONDS)
@@ -527,3 +527,6 @@ if __name__ == "__main__":
     app.log("[SYSTEM] พร้อมทำงาน ✅")
     root.protocol("WM_DELETE_WINDOW", lambda: (app.stop_system(), root.destroy()))
     root.mainloop()
+
+
+#
