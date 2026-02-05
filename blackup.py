@@ -12,7 +12,6 @@ import queue
 import shutil
 from datetime import datetime
 
-
 class YouTubeTTS:
     def __init__(self, root):
         self.root = root
