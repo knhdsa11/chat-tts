@@ -454,11 +454,11 @@ class YouTubeTTSv2:
                 time.sleep(0.2)
                 waited += 0.2
 
-            self.cleanup_old_tts_files()
+            self.cleanup_old_tts_files(max_keep=10)
 
         self.log("[TTS_WORKER] หยุดทำงาน")
 
-    def cleanup_old_tts_files(self, max_keep: int = 50) -> None:
+    def cleanup_old_tts_files(self, max_keep: int = 10) -> None:
         files = [os.path.join(TEMP_DIR, f) for f in os.listdir(TEMP_DIR) if f.endswith(".mp3")]
         files.sort(key=os.path.getmtime, reverse=True)
         for old_file in files[max_keep:]:
