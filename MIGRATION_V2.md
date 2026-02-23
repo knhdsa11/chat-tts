@@ -1,16 +1,23 @@
-# Migration note: stable entrypoint
+# Migration note: stable modular entrypoint
 
-- Old files are kept as requested (`main.py`, `main1.py`, `blackup.py`).
-- New recommended entrypoint is `main_v2.py`.
+- Old files are kept as requested (`main.py`, `main1.py`, `blackup.py`, `main_v2.py`).
+- New recommended entrypoint is `main_v3.py`.
+- v3 splits logic into multiple files under `app/` for easier maintenance.
 
 ## Run
 ```bash
-python main_v2.py
+python main_v3.py
 ```
 
-## Key fixes in v2
-- Added safer delay validation and normalization.
-- Improved YouTube video-id extraction (`watch`, `youtu.be`, `live`, `shorts`, `embed`).
-- Added global pruning for spam-tracking memory growth.
-- Fixed blacklist add flow to consistently use lowercase.
-- Added explicit dependency support for `playsound3` in `requirements.txt`.
+## Structure
+- `app/config.py` : constants and runtime limits (including TTS cache cap = 10 files)
+- `app/utils.py` : generic helpers (`DelayConfig`, directory setup, URL parsing)
+- `app/services.py` : chat worker, voice loader, TTS generation/playback, cleanup helpers
+- `app/ui.py` : Tkinter UI + orchestration logic
+
+## Key fixes kept/improved
+- Delay validation and normalization.
+- Better YouTube video-id extraction (`watch`, `youtu.be`, `live`, `shorts`, `embed`).
+- Global pruning for spam-tracking memory growth.
+- Consistent lowercase blacklist handling.
+- Auto-remove old `.mp3` files after playback, keeping latest 10 files.
