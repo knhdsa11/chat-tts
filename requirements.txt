@@ -1,5 +1,5 @@
 pygame==2.6.1
 pytchat==0.5.5
-edge-tts==6.1.12
-tkinterweb==3.23.1
+edge-tts==7.2.7
+tkinterweb==4.23.3
 playsound3==3.2.8
