@@ -1,14 +1,10 @@
 pygame==2.6.1
 pytchat==0.5.5
-<<<<<<< ours
 edge-tts==7.2.7
 tkinterweb==4.23.3
 playsound3==3.3.1
-=======
 edge-tts==6.1.12
 tkinterweb==4.23.3
 playsound3==3.2.8
-<<<<<<< ours
->>>>>>> theirs
-=======
->>>>>>> theirs
+auto-py-to-exe==2.50.0
+gtts==2.5.4
