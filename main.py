@@ -7,18 +7,23 @@ import subprocess
 import shutil
 import tkinter as tk
 from datetime import datetime
+import configparser
 
 import pytchat
 from playsound3 import playsound
 
 # ================= CONFIG =================
-YOUTUBE_VIDEO_ID = "nwfQJ8zwAiI"   # ใส่ Video ID หรือ URL ไลฟ์
-VOICE = "th-TH-PremwadeeNeural"
+config = configparser.ConfigParser()
+config.read("config.ini")
+
+YOUTUBE_VIDEO_ID = config.get("settings","YOUTUBE_VIDEO_ID") # ใส่ Video ID หรือ URL ไลฟ์
+print(YOUTUBE_VIDEO_ID)   
+VOICE = config.get("settings","VOICE")
 
 CACHE_DIR = "tts_cache"
-DELAY_PER_CHAR = 0.06
-MAX_DELAY = 30
-CLEAR_EVERY = 10
+DELAY_PER_CHAR = config.getfloat("settings","DELAY_PER_CHAR")
+MAX_DELAY = config.getfloat("settings","MAX_DELAY")
+CLEAR_EVERY = config.getint("settings","CLEAR_EVERY")
 # ==========================================
 
 os.makedirs(CACHE_DIR, exist_ok=True)
