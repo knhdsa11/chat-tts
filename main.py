@@ -12,25 +12,20 @@ import configparser
 import pytchat
 from playsound3 import playsound
 
-# ================== UTF-8 FIX ==================
-sys.stdout.reconfigure(encoding="utf-8")
-
-# ================== LOAD CONFIG ==================
+# ================= CONFIG =================
 config = configparser.ConfigParser()
 config.read("config.ini")
 
-YOUTUBE_VIDEO_ID = config.get("settings", "YOUTUBE_VIDEO_ID", fallback="")
-VOICE = config.get("settings", "VOICE", fallback="th-TH-PremwadeeNeural")
-DELAY_PER_CHAR = config.getfloat("settings", "DELAY_PER_CHAR", fallback=0.06)
-MAX_DELAY = config.getfloat("settings", "MAX_DELAY", fallback=30)
-CLEAR_EVERY = config.getint("settings", "CLEAR_EVERY", fallback=10)
+YOUTUBE_VIDEO_ID = config.get("settings","YOUTUBE_VIDEO_ID") # ใส่ Video ID หรือ URL ไลฟ์
+print(YOUTUBE_VIDEO_ID)   
+VOICE = config.get("settings","VOICE")
 
-if not YOUTUBE_VIDEO_ID:
-    print("กรุณาตั้งค่า YOUTUBE_VIDEO_ID ใน config.ini")
-    sys.exit(1)
-
-# ================== GLOBAL ==================
 CACHE_DIR = "tts_cache"
+DELAY_PER_CHAR = config.getfloat("settings","DELAY_PER_CHAR")
+MAX_DELAY = config.getfloat("settings","MAX_DELAY")
+CLEAR_EVERY = config.getint("settings","CLEAR_EVERY")
+# ==========================================
+
 os.makedirs(CACHE_DIR, exist_ok=True)
 
 tts_queue = queue.Queue()
@@ -42,7 +37,7 @@ def log(msg):
     print(f"[{datetime.now().strftime('%H:%M:%S')}] {msg}")
 
 
-# ================== GUI (MAIN THREAD) ==================
+# ---------- GUI (ว่าง ๆ สำหรับ OBS) ----------
 def start_gui():
     root = tk.Tk()
     root.title("TTS Audio Bridge")
@@ -56,6 +51,7 @@ def start_gui():
     )
     label.pack(expand=True)
 
+    # ปิด GUI = ปิดโปรแกรมทั้งหมด
     def on_close():
         global running
         running = False
@@ -65,7 +61,7 @@ def start_gui():
     root.mainloop()
 
 
-# ================== TTS WORKER ==================
+# ---------- TTS WORKER ----------
 def tts_worker():
     global played_count
 
@@ -83,15 +79,10 @@ def tts_worker():
         )
 
         cmd = [
-            sys.executable,
-            "-m",
-            "edge_tts",
-            "--voice",
-            VOICE,
-            "--text",
-            text,
-            "--write-media",
-            filename,
+            sys.executable, "-m", "edge_tts",
+            "--voice", VOICE,
+            "--text", text,
+            "--write-media", filename
         ]
 
         try:
@@ -106,7 +97,7 @@ def tts_worker():
             time.sleep(delay)
 
         except Exception as e:
-            log(f"TTS ERROR: {e}")
+            log(f"❌ TTS ERROR: {e}")
 
         tts_queue.task_done()
 
@@ -115,44 +106,43 @@ def clear_cache():
     try:
         shutil.rmtree(CACHE_DIR)
         os.makedirs(CACHE_DIR, exist_ok=True)
-        log("ล้าง tts_cache แล้ว")
+        log("🧹 ล้าง tts_cache แล้ว")
     except Exception:
         pass
 
 
-# ================== CHAT LOOP (THREAD) ==================
-def chat_loop():
-    global running
-
-    chat = pytchat.create(video_id=YOUTUBE_VIDEO_ID)
-
-    while running and chat.is_alive():
-        for c in chat.get().sync_items():
-            msg = f"{c.author.name} พูดว่า {c.message}"
-            log(f"💬 {msg}")
-            tts_queue.put(msg)
-
-        time.sleep(1)
-
-
-# ================== MAIN ==================
+# ---------- MAIN (pytchat ต้องอยู่ main thread) ----------
 def main():
-    log("TTS CMD RUNNING")
+    global running
+    log("🎤 TTS CMD RUNNING (Ctrl+C เพื่อหยุด)")
 
-    # เริ่ม TTS worker
+    # เริ่ม worker
     worker = threading.Thread(target=tts_worker, daemon=True)
     worker.start()
 
-    # เริ่ม chat reader
-    chat_thread = threading.Thread(target=chat_loop, daemon=True)
-    chat_thread.start()
+    # เริ่ม GUI (thread แยก)
+    gui_thread = threading.Thread(target=start_gui, daemon=True)
+    gui_thread.start()
 
-    # GUI ต้องอยู่ main thread
-    start_gui()
+    # pytchat ต้องอยู่ main thread
+    chat = pytchat.create(video_id=YOUTUBE_VIDEO_ID)
 
-    # ปิดระบบ
-    tts_queue.put(None)
-    worker.join()
+    try:
+        while running and chat.is_alive():
+            for c in chat.get().sync_items():
+                msg = f"{c.author.name} พูดว่า {c.message}"
+                log(f"💬 {msg}")
+                tts_queue.put(msg)
+
+            time.sleep(1)
+
+    except KeyboardInterrupt:
+        log("⛔ หยุดระบบ")
+
+    finally:
+        running = False
+        tts_queue.put(None)
+        worker.join()
 
 
 if __name__ == "__main__":
