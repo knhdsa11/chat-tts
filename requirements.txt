@@ -8,3 +8,4 @@ tkinterweb==4.23.3
 playsound3==3.2.8
 auto-py-to-exe==2.50.0
 gtts==2.5.4
+psutil==7.2.2
