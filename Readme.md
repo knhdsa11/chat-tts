@@ -61,12 +61,12 @@ Chattts.cmd
 
 **รันผ่าน GUI** (แนะนำ):
 ```bash
-python GUI.py
+python main.py
 ```
 
 **รัน backend ตรงๆ** (headless):
 ```bash
-python main.py
+python api.py
 ```
 
 1. เปิด YouTube Live stream ที่ต้องการ
@@ -104,8 +104,8 @@ clear_every = 10
 
 ```
 chat-tts/
-├── main.py          # backend หลัก — YouTube chat reader + TTS worker
-├── GUI.py           # GUI dashboard + watcher (auto-restart)
+├── api.py           # backend หลัก — YouTube chat reader + TTS worker
+├── main.py          # GUI dashboard + watcher (auto-restart)
 ├── config.ini       # ตั้งค่าทั้งหมด
 ├── requirements.txt
 └── Chattts.cmd      # Windows helper — setup venv + run
